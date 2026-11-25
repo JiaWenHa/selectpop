@@ -114,7 +114,8 @@
       {
         "provider": "github",
         "owner": "JiaWenHa",
-        "repo": "selectpop"
+        "repo": "selectpop",
+        "releaseType": "release"
       }
     ]
   }
