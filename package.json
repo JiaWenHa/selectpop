@@ -1,6 +1,6 @@
 {
   "name": "selectpop",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "private": true,
   "description": "SelectPop / 划词助手 — 选中文字即刻弹出 复制 · 翻译 · 搜索（可接入 DeepSeek）的跨平台桌面工具",
   "main": "src/main/index.js",
@@ -52,6 +52,16 @@
     ],
     "win": {
       "icon": "build/icon.ico",
+      "extraFiles": [
+        {
+          "from": "portable/Start-SelectPop.cmd",
+          "to": "Start-SelectPop.cmd"
+        },
+        {
+          "from": "portable/README.txt",
+          "to": "README.txt"
+        }
+      ],
       "target": [
         {
           "target": "nsis",

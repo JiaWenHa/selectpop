@@ -16,3 +16,12 @@ assets/tray.png
 assets/tray@2x.png
 assets/trayTemplate.png
 assets/trayTemplate@2x.png
+
+# 本机调试产物（沙箱环境专用，不入库）
+installed/
+installed-data/
+.install-temp/
+.build-temp/
+install-selectpop.cmd
+run-selectpop.cmd
+setup.cmd

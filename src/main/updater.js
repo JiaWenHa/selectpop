@@ -8,6 +8,8 @@
  */
 
 const { app } = require('electron');
+const fs = require('fs');
+const path = require('path');
 
 class Updater {
   constructor({ logger, notify, getSettingsWindow }) {
@@ -22,6 +24,13 @@ class Updater {
     // 未打包（开发/冒烟）时 electron-updater 读不到 app-update.yml，直接跳过。
     if (!app.isPackaged) {
       this.logger.debug('未打包环境，跳过自动更新');
+      return;
+    }
+    // 只有 NSIS 安装版才带卸载器；便携版（portable）与绿色版（zip 解压）没有，
+    // electron-updater 依赖安装器替换运行中的文件，非安装版不支持自动更新。
+    const uninstaller = path.join(path.dirname(process.execPath), 'Uninstall SelectPop.exe');
+    if (!fs.existsSync(uninstaller)) {
+      this.logger.info('非安装版（便携版/绿色版），不支持自动更新');
       return;
     }
     try {
@@ -67,7 +76,7 @@ class Updater {
 
   async checkForUpdates() {
     if (!this.autoUpdater) {
-      this.broadcast('error', { message: '自动更新仅对安装版生效（开发版 / 便携版不可用）。' });
+      this.broadcast('error', { message: '便携版不支持自动更新，请使用安装版（Setup）使用此功能。' });
       return { ok: false, reason: 'unavailable' };
     }
     try {

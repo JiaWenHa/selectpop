@@ -12,6 +12,7 @@ Windows 与 macOS 同一套代码；AI 相关动作（解释/总结/润色/语�
 
 ## 目录
 
+- [下载使用](#下载使用)
 - [功能](#功能)
 - [快速开始](#快速开始)
 - [接入 DeepSeek](#接入-deepseek)
@@ -24,6 +25,19 @@ Windows 与 macOS 同一套代码；AI 相关动作（解释/总结/润色/语�
 - [项目结构](#项目结构)
 - [常见问题](#常见问题)
 - [隐私](#隐私)
+
+## 下载使用
+
+面向普通用户，不需要装开发环境。GitHub Release 只发布 **Windows 绿色版**（zip）：
+
+1. 到 [Releases](../../releases) 下载最新的 `SelectPop-x.x.x-win.zip`；
+2. 解压到一个文件夹（建议路径不含中文与空格，例如 `D:\SelectPop`）；
+3. 双击 `Start-SelectPop.cmd` 启动；
+4. 程序进入系统托盘，在任意软件里划选文字即弹出操作窗口。
+
+zip 里自带 `README.txt`（使用说明，中文）。要解锁「AI 翻译 / 解释 / 总结 / 润色 / 语法检查」，右键托盘图标 → 打开设置 → **AI**，填 DeepSeek API Key（见[接入 DeepSeek](#接入-deepseek)）。
+
+> 绿色版不支持自动更新；升级时下载新 zip 解压覆盖整个文件夹，保留 `.data` 目录即可保留设置与 API Key。
 
 ## 功能
 
@@ -280,18 +294,12 @@ pnpm dist:mac   # macOS：dmg + zip（arm64 + x64，需在 mac 上执行）
 2. `uiohook-napi` 能加载（它同样是 asarUnpack，`--dir` 版能直接跑说明没问题）；
 3. macOS 版重新授予「辅助功能」权限（每次重新签名都要重新授权）。
 
-## 发版与自动更新
+## 发版
 
-自动更新基于 [electron-updater](https://www.electron.build/auto-update) + GitHub Release：
-
-- **只有 NSIS 安装版能自动更新**。免安装便携版（portable）没有安装路径，无法替换自身，因此不参与更新；`app-update.yml` 只写进安装版。
-- macOS 的自动更新需要代码签名（未签名的包会弹安全提示甚至无法替换）。当前 Actions 里以 `CSC_IDENTITY_AUTO_DISCOVERY=false` 跳过签名，发布的是未签名 dmg/zip，供手动安装。
-- 更新检查入口在「设置 → 关于 → 检查更新」，也支持系统托盘通知。
-
-### 发版流程（推荐用 GitHub Actions 全自动）
+GitHub Release 只发布 **Windows 绿色版**（zip），不含安装版与 macOS 包。发布流程用 GitHub Actions 全自动：
 
 ```bash
-# 1. 改版本号（每次发版必须递增，否则 electron-updater 判为无更新）
+# 1. 改版本号
 #    编辑 package.json 的 "version"，例如 0.1.0 → 0.2.0
 
 # 2. 提交并打 tag（tag 前缀 v 会触发 .github/workflows/release.yml）
@@ -302,14 +310,16 @@ git push origin main
 git push origin v0.2.0
 ```
 
-推送 `v*` 标签后，GitHub Actions 会分别在 Windows 和 macOS 上：
+推送 `v*` 标签后，GitHub Actions 在 Windows 上：
 
-1. `pnpm install`（含 uiohook-napi / electron 的预编译产物）；
+1. `pnpm install`（含 uiohook-napi / electron 预编译产物）；
 2. `node scripts/gen-icons.js` 生成图标（build/icon.ico 等是生成产物，不入库）；
-3. `node scripts/build-helper.js` 编译 Windows 的 sendcopy.exe / wininfo.exe（macOS 上自动跳过）；
-4. `electron-builder --publish always` 构建安装包并上传到 GitHub Release。
+3. `node scripts/build-helper.js` 编译 sendcopy.exe / wininfo.exe；
+4. `electron-builder --win zip --x64 --publish always` 构建绿色版 zip 并上传 Release。
 
-发布后，已安装的 NSIS 版用户点「检查更新」即可拿到新版本。**注意**：发版前务必确认 `package.json` 的 `build.publish` 里 `owner`/`repo` 与你的仓库一致（当前为 `JiaWenHa/selectpop`）。
+zip 里自动带上 `Start-SelectPop.cmd` 与 `README.txt`（由 `build.win.extraFiles` 复制进 win-unpacked）。绿色版不支持自动更新，用户升级 = 下载新 zip 覆盖整个文件夹、保留 `.data` 目录。
+
+代码里仍保留 electron-updater（`src/main/updater.js`），但绿色版没有安装器，点「检查更新」会直接提示「便携版不支持自动更新」；如需恢复自动更新能力，需重新发布 NSIS 安装版（`electron-builder --win nsis`）并让用户改用安装版。**注意**：发版前务必确认 `package.json` 的 `build.publish` 里 `owner`/`repo` 与你的仓库一致（当前为 `JiaWenHa/selectpop`）。
 
 ## 平台差异与权限
 
