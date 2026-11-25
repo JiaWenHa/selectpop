@@ -1,0 +1,13 @@
+packages:
+  - '.'
+
+# electron-builder 需要扁平化的 node_modules（pnpm 默认符号链接在打包时会丢文件）
+nodeLinker: hoisted
+shamefullyHoist: true
+strictPeerDependencies: false
+
+# pnpm 10+ 默认不执行依赖的安装脚本；这几个必须放行
+allowBuilds:
+  electron: true
+  uiohook-napi: true
+  electron-winstaller: true

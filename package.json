@@ -1,0 +1,121 @@
+{
+  "name": "selectpop",
+  "version": "0.1.0",
+  "private": true,
+  "description": "SelectPop / 划词助手 — 选中文字即刻弹出 复制 · 翻译 · 搜索（可接入 DeepSeek）的跨平台桌面工具",
+  "main": "src/main/index.js",
+  "author": "SelectPop",
+  "license": "MIT",
+  "engines": {
+    "node": ">=22.12"
+  },
+  "scripts": {
+    "start": "electron .",
+    "dev": "electron . --dev",
+    "smoke": "electron . --smoke",
+    "test": "node --test --test-isolation=none tests/*.test.js",
+    "check-api": "node scripts/check-api.js",
+    "icons": "node scripts/gen-icons.js",
+    "build:helper": "node scripts/build-helper.js",
+    "dist:win": "node scripts/build-helper.js && electron-builder --win --x64",
+    "dist:mac": "node scripts/build-helper.js && electron-builder --mac",
+    "dist:dir": "node scripts/build-helper.js && electron-builder --dir"
+  },
+  "dependencies": {
+    "electron-updater": "^6.8.11",
+    "uiohook-napi": "1.5.5"
+  },
+  "devDependencies": {
+    "electron": "45.4.1",
+    "electron-builder": "26.18.0"
+  },
+  "build": {
+    "appId": "com.selectpop.desktop",
+    "productName": "SelectPop",
+    "copyright": "Copyright © 2026 SelectPop",
+    "directories": {
+      "output": "dist",
+      "buildResources": "build"
+    },
+    "files": [
+      "src/**/*",
+      "assets/**/*",
+      "package.json",
+      "!**/*.map",
+      "!**/test{,s}/**"
+    ],
+    "asar": true,
+    "npmRebuild": false,
+    "asarUnpack": [
+      "**/node_modules/uiohook-napi/**",
+      "assets/**"
+    ],
+    "win": {
+      "icon": "build/icon.ico",
+      "target": [
+        {
+          "target": "nsis",
+          "arch": [
+            "x64"
+          ]
+        },
+        {
+          "target": "portable",
+          "arch": [
+            "x64"
+          ]
+        }
+      ]
+    },
+    "nsis": {
+      "oneClick": false,
+      "perMachine": false,
+      "allowToChangeInstallationDirectory": true,
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": true,
+      "shortcutName": "SelectPop 划词助手",
+      "artifactName": "SelectPop-Setup-${version}-${arch}.${ext}"
+    },
+    "portable": {
+      "artifactName": "SelectPop-Portable-${version}-${arch}.${ext}"
+    },
+    "mac": {
+      "icon": "build/icon.png",
+      "category": "public.app-category.productivity",
+      "target": [
+        {
+          "target": "dmg",
+          "arch": [
+            "arm64",
+            "x64"
+          ]
+        },
+        {
+          "target": "zip",
+          "arch": [
+            "arm64",
+            "x64"
+          ]
+        }
+      ],
+      "hardenedRuntime": true,
+      "entitlements": "build/entitlements.mac.plist",
+      "entitlementsInherit": "build/entitlements.mac.plist",
+      "extendInfo": {
+        "NSAppleEventsUsageDescription": "SelectPop 需要模拟 Command+C 来读取你选中的文字。",
+        "NSAccessibilityUsageDescription": "SelectPop 需要辅助功能权限来监听鼠标划词并模拟复制快捷键。",
+        "LSUIElement": true
+      }
+    },
+    "dmg": {
+      "artifactName": "SelectPop-${version}-${arch}.${ext}"
+    },
+    "publish": [
+      {
+        "provider": "github",
+        "owner": "JiaWenHa",
+        "repo": "selectpop"
+      }
+    ]
+  }
+}
